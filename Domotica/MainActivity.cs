@@ -57,7 +57,7 @@ namespace Domotica
         Switch switchSwitch2;
         Switch switchSwitch3;
         TextView textViewServerConnect, textViewTimerStateValue;
-        public TextView textViewChangePinStateValue, textViewSensorValue, textViewDebugValue;
+        public TextView textViewChangePinStateValue, textViewSensorValue1, textViewSensorValue2, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
 
         Timer timerClock, timerSockets;             // Timers   
@@ -78,7 +78,8 @@ namespace Domotica
             textViewTimerStateValue = FindViewById<TextView>(Resource.Id.textViewTimerStateValue);
             textViewServerConnect = FindViewById<TextView>(Resource.Id.textViewServerConnect);
             textViewChangePinStateValue = FindViewById<TextView>(Resource.Id.textViewChangePinStateValue);
-            textViewSensorValue = FindViewById<TextView>(Resource.Id.textViewSensorValue);
+            textViewSensorValue1 = FindViewById<TextView>(Resource.Id.textViewSensorValue1);
+            textViewSensorValue2 = FindViewById<TextView>(Resource.Id.textViewSensorValue2);
             textViewDebugValue = FindViewById<TextView>(Resource.Id.textViewDebugValue);
             editTextIPAddress = FindViewById<EditText>(Resource.Id.editTextIPAddress);
             editTextIPPort = FindViewById<EditText>(Resource.Id.editTextIPPort);
@@ -91,7 +92,8 @@ namespace Domotica
 
             // Init commandlist, scheduled by socket timer
             commandList.Add(new Tuple<string, TextView>("s", textViewChangePinStateValue));
-            commandList.Add(new Tuple<string, TextView>("a", textViewSensorValue));
+            commandList.Add(new Tuple<string, TextView>("a", textViewSensorValue1));
+            commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue2));
 
             this.Title = this.Title + " (timer sockets)";
 

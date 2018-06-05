@@ -14,7 +14,9 @@
   <string name="pin_state_text">Arduino Pin state</string>
   <string name="change_pin_state_value">OFF</string>
   <string name="sensor1_text">Sensor #1 value</string>
-  <string name="sensor_value">-</string>
+  <string name="sensor1_value">-</string>
+  <string name="sensor2_text">Sensor #2 value</string>
+  <string name="sensor2_value">-</string>
   <string name="debug_text">Debug</string>
   <string name="debug_value">-</string>
   <string name="exit">Exit</string>
