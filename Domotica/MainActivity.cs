@@ -59,8 +59,10 @@ namespace Domotica
         TextView textViewServerConnect, textViewTimerStateValue;
         public TextView textViewChangePinStateValue, textViewSensorValue1, textViewSensorValue2, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
+        Spinner delaySpinner;
 
-        Timer timerClock, timerSockets;             // Timers   
+        Timer timerClock, timerSockets;             // Timers
+        int timerDelay = 1000;
         Socket socket = null;                       // Socket   
         List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
         int listIndex = 0;
@@ -80,13 +82,21 @@ namespace Domotica
             textViewChangePinStateValue = FindViewById<TextView>(Resource.Id.textViewChangePinStateValue);
             textViewSensorValue1 = FindViewById<TextView>(Resource.Id.textViewSensorValue1);
             textViewSensorValue2 = FindViewById<TextView>(Resource.Id.textViewSensorValue2);
-            textViewDebugValue = FindViewById<TextView>(Resource.Id.textViewDebugValue);
             editTextIPAddress = FindViewById<EditText>(Resource.Id.editTextIPAddress);
             editTextIPPort = FindViewById<EditText>(Resource.Id.editTextIPPort);
 
             switchSwitch1 = FindViewById<Switch>(Resource.Id.switchSwitch1);
             switchSwitch2 = FindViewById<Switch>(Resource.Id.switchSwitch2);
             switchSwitch3 = FindViewById<Switch>(Resource.Id.switchSwitch3);
+
+            delaySpinner = FindViewById<Spinner>(Resource.Id.delaySpinner);
+
+            delaySpinner.ItemSelected += new EventHandler<AdapterView.ItemSelectedEventArgs>(delaySpinner_ItemSelected);
+            var adapter = ArrayAdapter.CreateFromResource(
+                    this, Resource.Array.delay_spinner, Android.Resource.Layout.SimpleSpinnerItem);
+
+            adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
+            delaySpinner.Adapter = adapter;
 
             UpdateConnectionState(4, "Disconnected");
 
@@ -106,7 +116,7 @@ namespace Domotica
 
             // timer object, check Arduino state
             // Only one command can be serviced in an timer tick, schedule from list
-            timerSockets = new System.Timers.Timer() { Interval = 1000, Enabled = false }; // Interval >= 750
+            timerSockets = new System.Timers.Timer() { Interval = timerDelay, Enabled = false }; // Interval >= 750
             timerSockets.Elapsed += (obj, args) =>
             {
                 //RunOnUiThread(() =>

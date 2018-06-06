@@ -17,6 +17,8 @@ public final class R {
         public static final int abort=0x7f060019;
         public static final int buttonChangePinState=0x7f06000b;
         public static final int buttonConnect=0x7f06000a;
+        public static final int editText1=0x7f060010;
+        public static final int editText2=0x7f060013;
         public static final int editTextIPAddress=0x7f060008;
         public static final int editTextIPPort=0x7f060009;
         public static final int exit=0x7f060018;
@@ -28,14 +30,12 @@ public final class R {
         public static final int textView2=0x7f060014;
         public static final int textViewChangePinState=0x7f06000c;
         public static final int textViewChangePinStateValue=0x7f06000d;
-        public static final int textViewDebug=0x7f060012;
-        public static final int textViewDebugValue=0x7f060013;
         public static final int textViewIPAddress=0x7f060006;
         public static final int textViewIPPort=0x7f060007;
         public static final int textViewSensor1=0x7f06000e;
-        public static final int textViewSensor2=0x7f060010;
+        public static final int textViewSensor2=0x7f060011;
         public static final int textViewSensorValue1=0x7f06000f;
-        public static final int textViewSensorValue2=0x7f060011;
+        public static final int textViewSensorValue2=0x7f060012;
         public static final int textViewServer=0x7f060004;
         public static final int textViewServerConnect=0x7f060005;
         public static final int textViewTimerState=0x7f060002;

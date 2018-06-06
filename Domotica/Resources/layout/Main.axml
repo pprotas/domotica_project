@@ -14,7 +14,7 @@
         <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="311.3dp"
+            android:layout_height="319.3dp"
             android:id="@+id/relativeLayout1"
             android:layout_marginBottom="0.0dp">
             <TextView
@@ -129,7 +129,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
                 android:text="@string/sensor1_value"
-                android:layout_width="200dp"
+                android:layout_width="150dp"
                 android:layout_height="30dp"
                 android:id="@+id/textViewSensorValue1"
                 android:layout_alignParentRight="true"
@@ -145,28 +145,28 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
                 android:text="@string/sensor2_value"
-                android:layout_width="200dp"
+                android:layout_width="150dp"
                 android:layout_height="30dp"
                 android:id="@+id/textViewSensorValue2"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/textViewSensorValue1"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:layout_below="@+id/textViewSensor1"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginRight="0.0dp" />
             <TextView
-                android:text="@string/debug_text"
-                android:layout_width="150dp"
-                android:layout_height="30dp"
-                android:id="@+id/textViewDebug"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/textViewSensor2"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-            <TextView
-                android:text="@string/debug_value"
+                android:text="Measurement delay:"
                 android:layout_width="200dp"
                 android:layout_height="30dp"
-                android:id="@+id/textViewDebugValue"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/textViewSensorValue2"
+                android:id="@+id/textViewDelay"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/textViewSensor2"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
+            <Spinner
+                android:id="@+id/delaySpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:prompt="@string/delay_spinner"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/textViewSensor2" />
         </RelativeLayout>
         <TextView
             android:text="Switches"

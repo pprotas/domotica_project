@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
     <AndroidDesignerPreferredDevice>Nexus 5</AndroidDesignerPreferredDevice>
-    <SelectedDevice>Samsung SM-G950F</SelectedDevice>
+    <SelectedDevice>Samsung SM-G355HN</SelectedDevice>
     <AndroidDesignerPreferredTheme>Theme.DeviceDefault</AndroidDesignerPreferredTheme>
   </PropertyGroup>
 </Project>

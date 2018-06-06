@@ -142,8 +142,12 @@ void loop()
   {
     checkEvent(switchPin, pinState);          // update pin state
     sensor1Value = readSensor(0, 100);         // update sensor value
+    delay(10);
+    sensor1Value = readSensor(0, 100);
     delay(100);
-    sensor2Value = readSensor(3, 100);
+    sensor2Value = readSensor(2, 100);
+    delay(10);
+    sensor2Value = readSensor(2, 100);
 
     // Activate pin based op pinState
     if (pinChange) {
@@ -274,9 +278,6 @@ void executeCommand(char cmd)
 // read value from pin pn, return value is mapped between 0 and mx-1
 int readSensor(int pn, int mx)
 {
-  Serial.print(pn);
-  Serial.print(" = ");
-  Serial.println(analogRead(pn));
   return map(analogRead(pn), 0, 1023, 0, mx - 1);
 }
 
