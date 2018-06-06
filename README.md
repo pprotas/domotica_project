@@ -1,2 +1,2 @@
 # domotica_project
-Repository voor het domotica project uit periode 4
+Repository voor de domotica opdracht A uit opdracht 4
