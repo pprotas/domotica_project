@@ -109,7 +109,7 @@ namespace DomoticaApp
             this.Title = this.Title + " (timer sockets)";
 
             // timer object, running clock
-            timerClock = new System.Timers.Timer() { Interval = timerDelay, Enabled = true }; // Interval >= 1000
+            timerClock = new System.Timers.Timer() { Interval = 1000, Enabled = true }; // Interval >= 1000
             timerClock.Elapsed += (obj, args) =>
             {
                 RunOnUiThread(() => { textViewTimerStateValue.Text = DateTime.Now.ToString("h:mm:ss"); });
