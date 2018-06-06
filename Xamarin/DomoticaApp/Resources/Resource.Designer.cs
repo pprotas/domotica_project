@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("Domotica.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("DomoticaApp.Resource", IsApplication=true)]
 
-namespace Domotica
+namespace DomoticaApp
 {
 	
 	
@@ -32,7 +32,7 @@ namespace Domotica
 		{
 			
 			// aapt resource value: 0x7f050000
-			public const int delay_spinner = 2131034112;
+			public const int planets_array = 2131034112;
 			
 			static Array()
 			{
@@ -76,8 +76,8 @@ namespace Domotica
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f070018
-			public const int abort = 2131165208;
+			// aapt resource value: 0x7f070019
+			public const int abort = 2131165209;
 			
 			// aapt resource value: 0x7f07000b
 			public const int buttonChangePinState = 2131165195;
@@ -91,8 +91,8 @@ namespace Domotica
 			// aapt resource value: 0x7f070009
 			public const int editTextIPPort = 2131165193;
 			
-			// aapt resource value: 0x7f070017
-			public const int exit = 2131165207;
+			// aapt resource value: 0x7f070018
+			public const int exit = 2131165208;
 			
 			// aapt resource value: 0x7f070001
 			public const int relativeLayout1 = 2131165185;
@@ -100,17 +100,20 @@ namespace Domotica
 			// aapt resource value: 0x7f070000
 			public const int scrollView1 = 2131165184;
 			
-			// aapt resource value: 0x7f070014
-			public const int switchSwitch1 = 2131165204;
+			// aapt resource value: 0x7f070013
+			public const int spinner = 2131165203;
 			
 			// aapt resource value: 0x7f070015
-			public const int switchSwitch2 = 2131165205;
+			public const int switchSwitch1 = 2131165205;
 			
 			// aapt resource value: 0x7f070016
-			public const int switchSwitch3 = 2131165206;
+			public const int switchSwitch2 = 2131165206;
 			
-			// aapt resource value: 0x7f070013
-			public const int textView2 = 2131165203;
+			// aapt resource value: 0x7f070017
+			public const int switchSwitch3 = 2131165207;
+			
+			// aapt resource value: 0x7f070014
+			public const int textView2 = 2131165204;
 			
 			// aapt resource value: 0x7f07000c
 			public const int textViewChangePinState = 2131165196;
@@ -150,9 +153,8 @@ namespace Domotica
 			
 			// aapt resource value: 0x7f070003
 			public const int textViewTimerStateValue = 2131165187;
-
-
-            static Id()
+			
+			static Id()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
 			}
@@ -201,7 +203,7 @@ namespace Domotica
 			public const int abort = 2130968596;
 			
 			// aapt resource value: 0x7f040000
-			public const int application_name = 2130968576;
+			public const int app_name = 2130968576;
 			
 			// aapt resource value: 0x7f040004
 			public const int arduino_server_connect = 2130968580;
@@ -241,6 +243,9 @@ namespace Domotica
 			
 			// aapt resource value: 0x7f04000b
 			public const int pin_state_text = 2130968587;
+			
+			// aapt resource value: 0x7f040018
+			public const int planet_prompt = 2130968600;
 			
 			// aapt resource value: 0x7f04000d
 			public const int sensor1_text = 2130968589;

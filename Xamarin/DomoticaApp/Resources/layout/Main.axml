@@ -164,16 +164,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner"
-                android:prompt="@string/spinner"
+                android:prompt="@string/planet_prompt"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textViewSensor2" />
-            <TextView
-                android:text="Small Text"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/textViewDelay"
-                android:id="@+id/reeee" />
         </RelativeLayout>
         <TextView
             android:text="Switches"

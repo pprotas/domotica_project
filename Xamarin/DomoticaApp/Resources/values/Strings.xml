@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="application_name">Domotica App</string>
+  <string name="app_name">Domotica App</string>
   <string name="timer_state_text">Time</string>
   <string name="timer_state_value">OFF</string>
   <string name="arduino_server_text">Arduino server</string>
@@ -24,7 +24,8 @@
   <string name="switch_switch1_text">Switch 1</string>
   <string name="switch_switch2_text">Switch 2</string>
   <string name="switch_switch3_text">Switch 3</string>
-  <string-array name="spinner">
+  <string name="planet_prompt">Choose a delay</string>
+  <string-array name="planets_array">
     <item>1</item>
     <item>2</item>
     <item>3</item>

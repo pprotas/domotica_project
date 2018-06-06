@@ -43,9 +43,9 @@ using System.Collections.Generic;
 using Android.Graphics;
 using System.Threading.Tasks;
 
-namespace Domotica
+namespace DomoticaApp
 {
-    [Activity(Label = "@string/application_name", MainLauncher = true, Icon = "@drawable/icon", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
+    [Activity(Label = "DomoticaAPp", MainLauncher = true, Icon = "@drawable/icon", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
 
     public class MainActivity : Activity
     {
@@ -59,7 +59,7 @@ namespace Domotica
         TextView textViewServerConnect, textViewTimerStateValue;
         public TextView textViewChangePinStateValue, textViewSensorValue1, textViewSensorValue2, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
-        Spinner delaySpinner;
+        Spinner spinner;
 
         Timer timerClock, timerSockets;             // Timers
         int timerDelay = 1000;
@@ -89,16 +89,15 @@ namespace Domotica
             switchSwitch2 = FindViewById<Switch>(Resource.Id.switchSwitch2);
             switchSwitch3 = FindViewById<Switch>(Resource.Id.switchSwitch3);
 
-            TextView reeLabel = FindViewById<TextView>(Resource.Id.);
 
-            delaySpinner = FindViewById<Spinner>(Resource.Id.spinner);
+            spinner = FindViewById<Spinner>(Resource.Id.spinner);
 
-            delaySpinner.ItemSelected += new EventHandler<AdapterView.ItemSelectedEventArgs>(delaySpinner_ItemSelected);
+            spinner.ItemSelected += new EventHandler<AdapterView.ItemSelectedEventArgs>(spinner_ItemSelected);
             var adapter = ArrayAdapter.CreateFromResource(
-                    this, Resource.Array.delay_spinner, Android.Resource.Layout.SimpleSpinnerItem);
+                    this, Resource.Array.planets_array, Android.Resource.Layout.SimpleSpinnerItem);
 
             adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
-            delaySpinner.Adapter = adapter;
+            spinner.Adapter = adapter;
 
             UpdateConnectionState(4, "Disconnected");
 
@@ -110,10 +109,10 @@ namespace Domotica
             this.Title = this.Title + " (timer sockets)";
 
             // timer object, running clock
-            timerClock = new System.Timers.Timer() { Interval = 2000, Enabled = true }; // Interval >= 1000
+            timerClock = new System.Timers.Timer() { Interval = timerDelay, Enabled = true }; // Interval >= 1000
             timerClock.Elapsed += (obj, args) =>
             {
-                RunOnUiThread(() => { textViewTimerStateValue.Text = DateTime.Now.ToString("h:mm:ss"); }); 
+                RunOnUiThread(() => { textViewTimerStateValue.Text = DateTime.Now.ToString("h:mm:ss"); });
             };
 
             // timer object, check Arduino state
@@ -123,13 +122,13 @@ namespace Domotica
             {
                 //RunOnUiThread(() =>
                 //{
-                    if (socket != null) // only if socket exists
-                    {
-                        // Send a command to the Arduino server on every tick (loop though list)
-                        UpdateGUI(executeCommand(commandList[listIndex].Item1), commandList[listIndex].Item2);  //e.g. UpdateGUI(executeCommand("s"), textViewChangePinStateValue);
-                        if (++listIndex >= commandList.Count) listIndex = 0;
-                    }
-                    else timerSockets.Enabled = false;  // If socket broken -> disable timer
+                if (socket != null) // only if socket exists
+                {
+                    // Send a command to the Arduino server on every tick (loop though list)
+                    UpdateGUI(executeCommand(commandList[listIndex].Item1), commandList[listIndex].Item2);  //e.g. UpdateGUI(executeCommand("s"), textViewChangePinStateValue);
+                    if (++listIndex >= commandList.Count) listIndex = 0;
+                }
+                else timerSockets.Enabled = false;  // If socket broken -> disable timer
                 //});
             };
 
@@ -156,7 +155,7 @@ namespace Domotica
                 };
             }
 
-            if(switchSwitch1 != null)
+            if (switchSwitch1 != null)
             {
                 switchSwitch1.Click += (sender, e) =>
                 {
@@ -179,10 +178,19 @@ namespace Domotica
             }
         }
 
+        private void spinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
+        {
+            Spinner spinner = (Spinner)sender;
+            string v = string.Format("{0}", spinner.GetItemAtPosition(e.Position));
+            timerDelay = Convert.ToInt32(v) * 1000;
+            timerSockets.Interval = timerDelay;
+            timerSockets.Stop();
+            timerSockets.Start();
+        }
 
-        //Send command to server and wait for response (blocking)
-        //Method should only be called when socket existst
-        public string executeCommand(string cmd)
+            //Send command to server and wait for response (blocking)
+            //Method should only be called when socket existst
+            public string executeCommand(string cmd)
         {
             byte[] buffer = new byte[4]; // response is always 4 bytes
             int bytesRead = 0;
@@ -203,9 +211,11 @@ namespace Domotica
                         result = Encoding.ASCII.GetString(buffer, 0, bytesRead - 1); // skip \n
                     else result = "err";
                 }
-                catch (Exception exception) {
+                catch (Exception exception)
+                {
                     result = exception.ToString();
-                    if (socket != null) {
+                    if (socket != null)
+                    {
                         socket.Close();
                         socket = null;
                     }
@@ -231,7 +241,8 @@ namespace Domotica
                 butConText = "Please wait";
                 color = Color.Orange;
                 butConEnabled = false;
-            } else
+            }
+            else
             if (state == 2)
             {
                 butConText = "Disconnect";
@@ -259,7 +270,7 @@ namespace Domotica
             {
                 if (result == "OFF") textview.SetTextColor(Color.Red);
                 else if (result == " ON") textview.SetTextColor(Color.Green);
-                else textview.SetTextColor(Color.White);  
+                else textview.SetTextColor(Color.White);
                 textview.Text = result;
             });
         }
@@ -281,7 +292,9 @@ namespace Domotica
                             UpdateConnectionState(2, "Connected");
                             timerSockets.Enabled = true;                //Activate timer for communication with Arduino     
                         }
-                    } catch (Exception exception) {
+                    }
+                    catch (Exception exception)
+                    {
                         timerSockets.Enabled = false;
                         if (socket != null)
                         {
@@ -290,7 +303,7 @@ namespace Domotica
                         }
                         UpdateConnectionState(4, exception.Message);
                     }
-	            }
+                }
                 else // disconnect socket
                 {
                     socket.Close(); socket = null;
@@ -340,12 +353,14 @@ namespace Domotica
         //Check if the entered IP address is valid.
         private bool CheckValidIpAddress(string ip)
         {
-            if (ip != "") {
+            if (ip != "")
+            {
                 //Check user input against regex (check if IP address is not empty).
                 Regex regex = new Regex("\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}\\b");
                 Match match = regex.Match(ip);
                 return match.Success;
-            } else return false;
+            }
+            else return false;
         }
 
         //Check if the entered port is valid.
@@ -364,7 +379,8 @@ namespace Domotica
                     return ((portAsInteger >= 0) && (portAsInteger <= 65535));
                 }
                 else return false;
-            } else return false;
+            }
+            else return false;
         }
     }
 }
