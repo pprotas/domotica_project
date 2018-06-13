@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">HomeSafe9001</string>
+  <string name="ip_address_textView">IP Address</string>
+  <string name="port_textView">Port</string>
+  <string name="IPAddress_editText">192.168.1.1</string>
+  <string name="port_editText">3300</string>
+  <string name="connect_button">Connect</string>
+  <string name="connect_textView">Disconnected</string>
+</resources>

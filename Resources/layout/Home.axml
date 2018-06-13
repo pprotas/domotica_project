@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="25px"
+    android:minHeight="25px">
+    <RelativeLayout
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/home_relativeLayout">
+        <TextView
+            android:text="@string/ip_address_textView"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/ip_address_textView"
+            android:layout_alignParentLeft="true" />
+        <TextView
+            android:text="@string/port_textView"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/port_textView"
+            android:layout_alignParentRight="true" />
+        <EditText
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/IPAddress_editText"
+            android:text="@string/IPAddress_editText"
+            android:lines="1"
+            android:minLines="1"
+            android:maxLines="1"
+            android:inputType="numberDecimal"
+            android:digits="0123456789."
+            android:layout_below="@id/ip_address_textView"
+            android:layout_alignParentLeft="true" />
+        <EditText
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/port_editText"
+            android:text="@string/port_editText"
+            android:lines="1"
+            android:minLines="1"
+            android:maxLines="1"
+            android:inputType="numberDecimal"
+            android:digits="0123456789"
+            android:layout_below="@id/port_textView"
+            android:layout_alignParentRight="true" />
+        <Button
+            android:text="@string/connect_button"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/IPAddress_editText"
+            android:id="@+id/buttonConnect"
+            android:layout_alignParentLeft="true"
+            android:backgroundTint="#add8e6ff" />
+        <TextView
+            android:text="@string/connect_textView"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/connect_textView"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/port_editText"
+            android:textColor="#FF0000" />
+    </RelativeLayout>
+</LinearLayout>
