@@ -49,8 +49,8 @@
         android:id="@+id/textView4" />
     <ImageView
         android:id="@+id/fingerImage"
+        android:layout_gravity="center"
         android:src="@drawable/fingerprint"
-        android:layout_centerInParent="true"
         android:layout_width="150dp"
         android:layout_height="150dp" />
     <TextView
