@@ -1922,9 +1922,6 @@ namespace HomeSafe9001
 			// aapt resource value: 0x7f0a002e
 			public const int bottom = 2131361838;
 			
-			// aapt resource value: 0x7f0a0080
-			public const int button1 = 2131361920;
-			
 			// aapt resource value: 0x7f0a0070
 			public const int buttonConnect = 2131361904;
 			
@@ -2035,6 +2032,9 @@ namespace HomeSafe9001
 			
 			// aapt resource value: 0x7f0a003b
 			public const int list_item = 2131361851;
+			
+			// aapt resource value: 0x7f0a0080
+			public const int logInButton = 2131361920;
 			
 			// aapt resource value: 0x7f0a0089
 			public const int media_actions = 2131361929;

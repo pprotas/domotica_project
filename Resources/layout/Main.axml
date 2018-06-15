@@ -39,7 +39,7 @@
         android:text="Continue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button1" />
+        android:id="@+id/logInButton" />
     <TextView
         android:gravity="center_horizontal"
         android:text="OR"

@@ -9,6 +9,7 @@ using Android.Support.V4.App;
 using Android;
 using System;
 using Android.Security.Keystore;
+using Android.Content;
 
 namespace HomeSafe9001
 {
@@ -23,6 +24,12 @@ namespace HomeSafe9001
             base.OnCreate(savedInstanceState);
             // Set our view from the "main" layout resource  
             SetContentView(Resource.Layout.Main);
+            Button logInButton = FindViewById<Button>(Resource.Id.logInButton);
+            logInButton.Click += (s, e) =>
+            {
+                Intent intent = new Intent(this, typeof(HomeActivity));
+                this.StartActivity(intent);
+            };
             KeyguardManager keyguardManager = (KeyguardManager)GetSystemService(KeyguardService);
             FingerprintManager fingerprintManager = (FingerprintManager)GetSystemService(FingerprintService);
             if (ActivityCompat.CheckSelfPermission(this, Manifest.Permission.UseFingerprint)
