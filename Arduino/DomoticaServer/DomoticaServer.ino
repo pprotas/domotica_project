@@ -47,7 +47,6 @@ byte mac[] = { 0x40, 0x6c, 0x8f, 0x36, 0x84, 0x8a }; // Ethernet adapter shield 
 int ethPort = 3300;                                  // Take a free port (check your router)
 
 #define RFPin        3  // output, pin to control the RF-sender (and Click-On Click-Off-device)
-#define lowPin       5  // output, always LOW
 #define highPin      6  // output, always HIGH
 #define switchPin    7  // input, connected to some kind of inputswitch
 #define ledPin       8  // output, led used for "connect state": blinking = searching; continuously = connected
@@ -69,6 +68,11 @@ bool pinChange = false;                  // Variable to store actual pin change
 int sensor1Value = 0;                    // Variable to store actual sensor value
 int sensor2Value = 0;
 int changedPin;
+int duration;
+int distanc;
+int oldDistanc;
+int trigPin = 4;
+int echoPin = 5;
 
 void setup()
 {
@@ -79,7 +83,8 @@ void setup()
 
   //Init I/O-pins
   pinMode(switchPin, INPUT);            // hardware switch, for changing pin state
-  pinMode(lowPin, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
   pinMode(highPin, OUTPUT);
   pinMode(RFPin, OUTPUT);
   pinMode(ledPin, OUTPUT);
@@ -87,11 +92,18 @@ void setup()
 
   //Default states
   digitalWrite(switchPin, HIGH);        // Activate pullup resistors (needed for input pin)
-  digitalWrite(lowPin, LOW);
   digitalWrite(highPin, HIGH);
   digitalWrite(RFPin, LOW);
   digitalWrite(ledPin, LOW);
   digitalWrite(infoPin, LOW);
+
+  digitalWrite(trigPin, LOW);
+      delayMicroseconds(2);
+      digitalWrite(trigPin, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trigPin, LOW);
+      duration = pulseIn(echoPin, HIGH);
+      oldDistanc = duration*0.034/2; 
 
   //Try to get an IP address from the DHCP server.
   if (Ethernet.begin(mac) == 0)
@@ -184,6 +196,25 @@ void switchDefault(bool state, int unit)
   //delay(100);
 }
 
+
+int DistanceChanged(int trig, int echo){
+      digitalWrite(trig, LOW);
+      delayMicroseconds(2);
+      digitalWrite(trig, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trig, LOW);
+      duration = pulseIn(echo, HIGH);
+      distanc= duration*0.034/2; 
+      if(oldDistanc - distanc > 5){
+        return 1;
+      }
+      else{
+        return 0;
+      }
+
+      
+}
+
 // Implementation of (simple) protocol between app and Arduino
 // Request (from app) is single char ('a', 's', 't', 'i' etc.)
 // Response (to app) is 4 chars  (not all commands demand a response)
@@ -199,10 +230,22 @@ void executeCommand(char cmd)
       server.write(buf, 4);                             // response is always 4 chars (\n included)
       Serial.print("Sensor #1: "); Serial.println(buf);
       break;
-      case 'b': // Report sensor value to the app
-      intToCharBuf(sensor2Value, buf, 4);                // convert to charbuffer
-      server.write(buf, 4);                             // response is always 4 chars (\n included)
-      Serial.print("Sensor #2: "); Serial.println(buf);
+    case 'b': // Report sensor value to the app
+      Serial.print("Distance changed?");
+      if(DistanceChanged(trigPin, echoPin)){
+        server.write("TRU\n");
+        Serial.println("yes");
+              Serial.println(oldDistanc);
+      Serial.println(distanc);
+      Serial.println(oldDistanc - distanc);
+      }
+      if(!DistanceChanged(trigPin, echoPin)){
+        server.write("FAL\n");
+        Serial.println("no");
+              Serial.println(oldDistanc);
+      Serial.println(distanc);
+      Serial.println(oldDistanc - distanc);
+      }
       break;
     case 's': // Report switch state to the app
       if (pinState) {
@@ -224,6 +267,9 @@ void executeCommand(char cmd)
         Serial.println("Set pin state to \"ON\"");
       }
       pinChange = true;
+      break;
+     case 'r':
+      server.write("  1\n");
       break;
     case '1': // Toggle state; If state is already ON then turn it OFF
       changedPin = 1;
@@ -274,6 +320,7 @@ void executeCommand(char cmd)
       digitalWrite(infoPin, LOW);
   }
 }
+
 
 // read value from pin pn, return value is mapped between 0 and mx-1
 int readSensor(int pn, int mx)
@@ -374,4 +421,5 @@ int getIPComputerNumberOffset(IPAddress address, int offset)
 {
   return getIPComputerNumber(address) - offset;
 }
+
 
