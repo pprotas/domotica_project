@@ -70,7 +70,7 @@ namespace HomeSafe9001
 
             // Init commandlist, scheduled by socket timer
             commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue1));
-            //commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue2));
+            commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue2));
 
             this.Title = this.Title + " (timer sockets)";
 
