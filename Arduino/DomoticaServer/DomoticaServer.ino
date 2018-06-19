@@ -48,7 +48,6 @@ byte mac[] = { 0x40, 0x6c, 0x8f, 0x36, 0x84, 0x8a }; // Ethernet adapter shield 
 int ethPort = 3300;                                  // Take a free port (check your router)
 
 #define RFPin        3  // output, pin to control the RF-sender (and Click-On Click-Off-device)
-#define lowPin       5  // output, always LOW
 #define highPin      6  // output, always HIGH
 #define switchPin    7  // input, connected to some kind of inputswitch
 #define ledPin       8  // output, led used for "connect state": blinking = searching; continuously = connected
@@ -75,6 +74,11 @@ int MasterValuePIR = 7;
 int AantalIngelogd = 0;
 bool tikkele ;
 bool jorar107 ;
+int duration;
+int distanc;
+int oldDistanc;
+int trigPin = 4;
+int echoPin = 5;
 
 void setup()
 {
@@ -84,10 +88,9 @@ void setup()
   Serial.println("Domotica project, Arduino Domotica Server\n");
   Wire.begin(9);                          //Set arduino slave/master connectie
   Wire.onReceive(receiveEvent);           //master ==> slave values event
-                       
+
   //Init I/O-pins
   pinMode(switchPin, INPUT);            // hardware switch, for changing pin state
-  pinMode(lowPin, OUTPUT);
   pinMode(highPin, OUTPUT);
   pinMode(RFPin, OUTPUT);
   pinMode(ledPin, OUTPUT);
@@ -95,12 +98,20 @@ void setup()
 
   //Default states
   digitalWrite(switchPin, HIGH);        // Activate pullup resistors (needed for input pin)
-  digitalWrite(lowPin, LOW);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
   digitalWrite(highPin, HIGH);
   digitalWrite(RFPin, LOW);
   digitalWrite(ledPin, LOW);
   digitalWrite(infoPin, LOW);
 
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  oldDistanc = duration * 0.034 / 2;
   //Try to get an IP address from the DHCP server.
   if (Ethernet.begin(mac) == 0)
   {
@@ -129,46 +140,46 @@ void setup()
 }
 
 void receiveEvent(int bytes) {      //read rfid send data from master
-  MasterValue1 = Wire.read(); 
- // Serial.println(MasterValue1);
+  MasterValue1 = Wire.read();
+  // Serial.println(MasterValue1);
   if (MasterValue1 == 0) {
-    
-    if(tikkele)
+
+    if (tikkele)
     {
       AantalIngelogd--;
-      tikkele = false;      
+      tikkele = false;
     }
-    else if(tikkele == false)
+    else if (tikkele == false)
     {
-      AantalIngelogd++;
-      tikkele= true;    
-    }  
-     Serial.print("AantalIngelogd=");  Serial.println(AantalIngelogd);
-     Serial.print("tikkele=");         Serial.println(tikkele);
-     Serial.print("MasterValue1=");    Serial.println(MasterValue1);
-     Serial.println("  ");
-     delay(1000);
-     MasterValue1 =11;  
+      AantalIngelogd;
+      tikkele = true;
+    }
+    Serial.print("AantalIngelogd=");  Serial.println(AantalIngelogd);
+    Serial.print("tikkele=");         Serial.println(tikkele);
+    Serial.print("MasterValue1=");    Serial.println(MasterValue1);
+    Serial.println("  ");
+    delay(1000);
+    MasterValue1 = 11;
   }
- else if (MasterValue1 == 1) {
-    if(jorar107)
+  else if (MasterValue1 == 1) {
+    if (jorar107)
     {
       AantalIngelogd--;
       jorar107 = false;
     }
-    else if(jorar107 == false)
+    else if (jorar107 == false)
     {
-      AantalIngelogd++;
-      jorar107= true;
-    }        
-     Serial.print("AantalIngelogd=");  Serial.println(AantalIngelogd);
-     Serial.print("jorar107=");        Serial.println(jorar107);
-     Serial.print("MasterValue1=");    Serial.println(MasterValue1);
-     Serial.println("  ");
-     delay(1000);
-     MasterValue1=11;
-  } 
-  // delay(1000); 
+      AantalIngelogd;
+      jorar107 = true;
+    }
+    Serial.print("AantalIngelogd=");  Serial.println(AantalIngelogd);
+    Serial.print("jorar107=");        Serial.println(jorar107);
+    Serial.print("MasterValue1=");    Serial.println(MasterValue1);
+    Serial.println("  ");
+    delay(1000);
+    MasterValue1 = 11;
+  }
+  // delay(1000);
 }
 
 void loop()
@@ -179,9 +190,9 @@ void loop()
   if (!ethernetClient) {
     blink(ledPin);
     return; // wait for connection and blink LED
-    
-  } 
-    
+
+  }
+
 
   Serial.println("Application connected");
   digitalWrite(ledPin, LOW);
@@ -234,10 +245,25 @@ void switchDefault(bool state, int unit)
   //delay(100);
   //actionTransmitter.sendSignal(unitCodeActionOld, actionDevice, state);  // Action Kaku, old model
   //delay(100);
-  //mySwitch.send(2210410 + state, 24);  // tricky, false = 0, true = 1  // Action Kaku, new model
+  //mySwitch.send(2210410  state, 24);  // tricky, false = 0, true = 1  // Action Kaku, new model
   //delay(100);
 }
 
+int DistanceChanged(int trig, int echo) {
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+  duration = pulseIn(echo, HIGH);
+  distanc = duration * 0.034 / 2;
+  if (oldDistanc - distanc > 5) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
 // Implementation of (simple) protocol between app and Arduino
 // Request (from app) is single char ('a', 's', 't', 'i' etc.)
 // Response (to app) is 4 chars  (not all commands demand a response)
@@ -248,20 +274,31 @@ void executeCommand(char cmd)
   // Command protocol
   Serial.print("["); Serial.print(cmd); Serial.print("] -> ");
   switch (cmd) {
-      case'r':// rfid shizzselss
+    case'r':// rfid shizzselss
       intToCharBuf(AantalIngelogd, buf, 4); //tikkele status
       server.write(buf, 4);
-      break;   
+      break;
     case 'a': // Report sensor value to the app
       intToCharBuf(sensor1Value, buf, 4);                // convert to charbuffer
       server.write(buf, 4);                             // response is always 4 chars (\n included)
       Serial.print("Sensor #1: "); Serial.println(buf);
       break;
-      case 'b': // Report sensor value to the app
-      intToCharBuf(sensor2Value, buf, 4);                // convert to charbuffer
-      server.write(buf, 4);                             // response is always 4 chars (\n included)
-      Serial.print("Sensor #2: "); Serial.println(buf);
-      break;
+    case 'b': // Report sensor value to the app
+      Serial.print("Distance changed?");
+      if (DistanceChanged(trigPin, echoPin)) {
+        server.write("TRU\n");
+        Serial.println("yes");
+        Serial.println(oldDistanc);
+        Serial.println(distanc);
+        Serial.println(oldDistanc - distanc);
+      }
+      if (!DistanceChanged(trigPin, echoPin)) {
+        server.write("FAL\n");
+        Serial.println("no");
+        Serial.println(oldDistanc);
+        Serial.println(distanc);
+        Serial.println(oldDistanc - distanc);
+      }
     case 's': // Report switch state to the app
       if (pinState) {
         server.write(" ON\n");  // always send 4 chars
@@ -344,9 +381,9 @@ void intToCharBuf(int val, char buf[], int len)
 {
   String s;
   s = String(val);                        // convert tot string
-  if (s.length() == 1) s = "0" + s;       // prefix redundant "0"
-  if (s.length() == 2) s = "0" + s;
-  s = s + "\n";                           // add newline
+  if (s.length() == 1) s = "0"  s;       // prefix redundant "0"
+  if (s.length() == 2) s = "0"  s;
+  s = s  "\n";                           // add newline
   s.toCharArray(buf, len);                // convert string to char-buffer
 }
 
@@ -388,7 +425,7 @@ void blink(int pn)
 void signalNumber(int pin, int n)
 {
   int i;
-  for (i = 0; i < 30; i++)
+  for (i = 0; i < 30; i)
   {
     digitalWrite(pin, HIGH);
     delay(20);
@@ -396,7 +433,7 @@ void signalNumber(int pin, int n)
     delay(20);
   }
   delay(1000);
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n; i)
   {
     digitalWrite(pin, HIGH);
     delay(300);
@@ -409,9 +446,9 @@ void signalNumber(int pin, int n)
 // Convert IPAddress tot String (e.g. "192.168.1.105")
 String IPAddressToString(IPAddress address)
 {
-  return String(address[0]) + "." +
-         String(address[1]) + "." +
-         String(address[2]) + "." +
+  return String(address[0])  "."
+         String(address[1])  "."
+         String(address[2])  "."
          String(address[3]);
 }
 
