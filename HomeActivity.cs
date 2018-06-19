@@ -69,8 +69,8 @@ namespace HomeSafe9001
             UpdateConnectionState(4, "Disconnected");
 
             // Init commandlist, scheduled by socket timer
-            commandList.Add(new Tuple<string, TextView>("a", textViewSensorValue1));
-            commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue2));
+            commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue1));
+            //commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue2));
 
             this.Title = this.Title + " (timer sockets)";
 
@@ -227,6 +227,16 @@ namespace HomeSafe9001
             {
                 if (result == "OFF") textview.SetTextColor(Color.Red);
                 else if (result == " ON") textview.SetTextColor(Color.Green);
+                if (result == "TRU")
+                {
+                    textview.SetTextColor(Color.Red);
+                    textview.Text = "Movement detected";
+                }
+                else if (result == "FAL")
+                {
+                    textview.SetTextColor(Color.Green);
+                    textview.Text = "No movement";
+                }
                 else textview.SetTextColor(Color.White);
                 textview.Text = result;
             });
