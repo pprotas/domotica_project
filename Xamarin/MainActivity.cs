@@ -13,7 +13,7 @@ using Android.Content;
 
 namespace HomeSafe9001
 {
-    [Activity(Label = "FingerAuth", MainLauncher = true, Theme = "@style/AppTheme")]
+    [Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/AppTheme")]
     public class MainActivity : AppCompatActivity
     {
         private KeyStore keyStore;
