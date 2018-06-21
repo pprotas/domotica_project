@@ -16,6 +16,10 @@ using System.Collections.Generic;
 using Android.Graphics;
 using System.Threading.Tasks;
 
+using Android.Support.V4.App;
+using TaskStackBuilder = Android.Support.V4.App.TaskStackBuilder;
+using NotificationCompat = Android.Support.V4.App.NotificationCompat;
+
 namespace HomeSafe9001
 {
     [Activity(Label = "HomeActivity", Theme = "@style/AppTheme")]
@@ -25,18 +29,21 @@ namespace HomeSafe9001
         // Controls on GUI
         Button buttonConnect;
         TextView textViewServerConnect, textViewTimerStateValue;
-        public TextView textViewChangePinStateValue, textViewSensorValue1, textViewSensorValue2, textViewDebugValue;
+        public TextView textViewChangePinStateValue, textViewSensorValue1, textViewSensorValue2, textViewSensorValue3, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
         Spinner spinner;
         Switch switchSwitch1;
         Switch switchSwitch2;
         Switch switchSwitch3;
+        NotificationService _notificationService;
+        int notificationId = 9001;
+        NotificationCompat.Builder builder;
+        NotificationManager notificationManager;
 
-        Timer timerClock, timerSockets;             // Timers
-        int timerDelay = 1000;
-        Socket socket = null;                       // Socket   
-        List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
-        int listIndex = 0;
+        Timer timerClock;             // Timers
+        public int timerDelay = 1000;
+        public List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
+        public int listIndex = 0;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -45,12 +52,15 @@ namespace HomeSafe9001
             // Set our view from the "main" layout resource (strings are loaded from Recources -> values -> Strings.xml)
             SetContentView(Resource.Layout.Home);
 
+            _notificationService = new NotificationService();
+
             // find and set the controls, so it can be used in the code
             buttonConnect = FindViewById<Button>(Resource.Id.buttonConnect);
             textViewTimerStateValue = FindViewById<TextView>(Resource.Id.textViewTimerStateValue);
             textViewServerConnect = FindViewById<TextView>(Resource.Id.textViewServerConnect);
             textViewSensorValue1 = FindViewById<TextView>(Resource.Id.textViewSensorValue1);
             textViewSensorValue2 = FindViewById<TextView>(Resource.Id.textViewSensorValue2);
+            textViewSensorValue3 = FindViewById<TextView>(Resource.Id.textViewSensorValue3);
             editTextIPAddress = FindViewById<EditText>(Resource.Id.editTextIPAddress);
             editTextIPPort = FindViewById<EditText>(Resource.Id.editTextIPPort);
             switchSwitch1 = FindViewById<Switch>(Resource.Id.switchSwitch1);
@@ -59,7 +69,7 @@ namespace HomeSafe9001
 
             spinner = FindViewById<Spinner>(Resource.Id.spinner);
 
-            spinner.ItemSelected += new EventHandler<AdapterView.ItemSelectedEventArgs>(spinner_ItemSelected);
+            //spinner.ItemSelected += new EventHandler<AdapterView.ItemSelectedEventArgs>(spinner_ItemSelected);
             var adapter = ArrayAdapter.CreateFromResource(
                     this, Resource.Array.planets_array, Android.Resource.Layout.SimpleSpinnerItem);
 
@@ -68,9 +78,27 @@ namespace HomeSafe9001
 
             UpdateConnectionState(4, "Disconnected");
 
+            Intent notificationIntent = new Intent(this, typeof(MainActivity));
+
+            TaskStackBuilder stackBuilder = TaskStackBuilder.Create(this);
+            stackBuilder.AddParentStack(Java.Lang.Class.FromType(typeof(MainActivity)));
+            stackBuilder.AddNextIntent(notificationIntent);
+
+            PendingIntent pendingNotificationIntent = stackBuilder.GetPendingIntent(0, (int)PendingIntentFlags.UpdateCurrent);
+
+            builder = new NotificationCompat.Builder(this)
+                .SetAutoCancel(true)
+                .SetContentIntent(pendingNotificationIntent)
+                .SetContentTitle("Movement detected")
+                .SetSmallIcon(Resource.Drawable.ic_stat_button_click)
+                .SetPriority(1);
+
+            notificationManager =
+                (NotificationManager)GetSystemService(NotificationService);
+
             // Init commandlist, scheduled by socket timer
-            commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue1));
-            //commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue2));
+            //commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue1));
+            commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue3));
 
             this.Title = this.Title + " (timer sockets)";
 
@@ -82,19 +110,19 @@ namespace HomeSafe9001
             };
 
             // timer object, check Arduino state
-            // Only one command can be serviced in an timer tick, schedule from list
-            timerSockets = new System.Timers.Timer() { Interval = timerDelay, Enabled = false }; // Interval >= 750
-            timerSockets.Elapsed += (obj, args) =>
+            //Only one command can be serviced in an timer tick, schedule from list
+            _notificationService.timerSockets = new System.Timers.Timer() { Interval = timerDelay, Enabled = false }; // Interval >= 750
+            _notificationService.timerSockets.Elapsed += (obj, args) =>
             {
                 //RunOnUiThread(() =>
                 //{
-                if (socket != null) // only if socket exists
+                if (_notificationService.socket != null) // only if socket exists
                 {
                     // Send a command to the Arduino server on every tick (loop though list)
                     UpdateGUI(executeCommand(commandList[listIndex].Item1), commandList[listIndex].Item2);  //e.g. UpdateGUI(executeCommand("s"), textViewChangePinStateValue);
                     if (++listIndex >= commandList.Count) listIndex = 0;
                 }
-                else timerSockets.Enabled = false;  // If socket broken -> disable timer
+                else _notificationService.timerSockets.Enabled = false;  // If socket broken -> disable timer
                 //});
             };
 
@@ -116,34 +144,34 @@ namespace HomeSafe9001
             {
                 switchSwitch1.Click += (sender, e) =>
                 {
-                    socket.Send(Encoding.ASCII.GetBytes("1"));
+                    _notificationService.socket.Send(Encoding.ASCII.GetBytes("1"));
                 };
             }
             if (switchSwitch2 != null)
             {
                 switchSwitch2.Click += (sender, e) =>
                 {
-                    socket.Send(Encoding.ASCII.GetBytes("2"));
+                    _notificationService.socket.Send(Encoding.ASCII.GetBytes("2"));
                 };
             }
             if (switchSwitch3 != null)
             {
                 switchSwitch3.Click += (sender, e) =>
                 {
-                    socket.Send(Encoding.ASCII.GetBytes("3"));
+                    _notificationService.socket.Send(Encoding.ASCII.GetBytes("3"));
                 };
             }
         }
 
-        private void spinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
-        {
-            Spinner spinner = (Spinner)sender;
-            string v = string.Format("{0}", spinner.GetItemAtPosition(e.Position));
-            timerDelay = Convert.ToInt32(v) * 1000;
-            timerSockets.Interval = timerDelay;
-            timerSockets.Stop();
-            timerSockets.Start();
-        }
+        //private void spinner_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
+        //{
+        //    Spinner spinner = (Spinner)sender;
+        //    string v = string.Format("{0}", spinner.GetItemAtPosition(e.Position));
+        //    timerDelay = Convert.ToInt32(v) * 1000;
+        //    _notificationService.timerSockets.Interval = timerDelay;
+        //    _notificationService.timerSockets.Stop();
+        //    _notificationService.timerSockets.Start();
+        //}
 
 
         //Send command to server and wait for response (blocking)
@@ -154,17 +182,17 @@ namespace HomeSafe9001
             int bytesRead = 0;
             string result = "---";
 
-            if (socket != null)
+            if (_notificationService.socket != null)
             {
                 //Send command to server
-                socket.Send(Encoding.ASCII.GetBytes(cmd));
+                _notificationService.socket.Send(Encoding.ASCII.GetBytes(cmd));
 
                 try //Get response from server
                 {
                     //Store received bytes (always 4 bytes, ends with \n)
-                    bytesRead = socket.Receive(buffer);  // If no data is available for reading, the Receive method will block until data is available,
+                    bytesRead = _notificationService.socket.Receive(buffer);  // If no data is available for reading, the Receive method will block until data is available,
                     //Read available bytes.              // socket.Available gets the amount of data that has been received from the network and is available to be read
-                    while (socket.Available > 0) bytesRead = socket.Receive(buffer);
+                    while (_notificationService.socket.Available > 0) bytesRead = _notificationService.socket.Receive(buffer);
                     if (bytesRead == 4)
                         result = Encoding.ASCII.GetString(buffer, 0, bytesRead - 1); // skip \n
                     else result = "err";
@@ -172,10 +200,10 @@ namespace HomeSafe9001
                 catch (Exception exception)
                 {
                     result = exception.ToString();
-                    if (socket != null)
+                    if (_notificationService.socket != null)
                     {
-                        socket.Close();
-                        socket = null;
+                        _notificationService.socket.Close();
+                        _notificationService.socket = null;
                     }
                     UpdateConnectionState(3, result);
                 }
@@ -231,14 +259,20 @@ namespace HomeSafe9001
                 {
                     textview.SetTextColor(Color.Red);
                     textview.Text = "Movement detected";
+                    
+                    notificationManager.Notify(notificationId, builder.Build());
                 }
                 else if (result == "FAL")
                 {
                     textview.SetTextColor(Color.Green);
                     textview.Text = "No movement";
                 }
+                if(result == "001")
+                {
+
+                }
                 else textview.SetTextColor(Color.White);
-                textview.Text = result;
+                //textview.Text = result;
             });
         }
 
@@ -247,34 +281,35 @@ namespace HomeSafe9001
         {
             RunOnUiThread(() =>
             {
-                if (socket == null)                                       // create new socket
+                if (_notificationService.socket == null)                                       // create new socket
                 {
                     UpdateConnectionState(1, "Connecting...");
                     try  // to connect to the server (Arduino).
                     {
-                        socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                        socket.Connect(new IPEndPoint(IPAddress.Parse(ip), Convert.ToInt32(prt)));
-                        if (socket.Connected)
+                        _notificationService.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        _notificationService.socket.Connect(new IPEndPoint(IPAddress.Parse(ip), Convert.ToInt32(prt)));
+                        if (_notificationService.socket.Connected)
                         {
+                            StartService(new Intent(this, typeof(NotificationService)));
                             UpdateConnectionState(2, "Connected");
-                            timerSockets.Enabled = true;                //Activate timer for communication with Arduino     
+                            _notificationService.timerSockets.Enabled = true;                //Activate timer for communication with Arduino
                         }
                     }
                     catch (Exception exception)
                     {
-                        timerSockets.Enabled = false;
-                        if (socket != null)
+                        _notificationService.timerSockets.Enabled = false;
+                        if (_notificationService.socket != null)
                         {
-                            socket.Close();
-                            socket = null;
+                            _notificationService.socket.Close();
+                            _notificationService.socket = null;
                         }
                         UpdateConnectionState(4, exception.Message);
                     }
                 }
                 else // disconnect socket
                 {
-                    socket.Close(); socket = null;
-                    timerSockets.Enabled = false;
+                    _notificationService.socket.Close(); _notificationService.socket = null;
+                    _notificationService.timerSockets.Enabled = false;
                     UpdateConnectionState(4, "Disconnected");
                 }
             });
@@ -283,13 +318,26 @@ namespace HomeSafe9001
         //Close the connection (stop the threads) if the application stops.
         protected override void OnStop()
         {
+            StartService(new Intent(this, typeof(NotificationService)));
+
             base.OnStop();
         }
 
         //Close the connection (stop the threads) if the application is destroyed.
         protected override void OnDestroy()
         {
+
             base.OnDestroy();
+        }
+
+        protected override void OnRestart()
+        {
+            if (_notificationService.socket.Connected)
+                UpdateConnectionState(2, "Connected");
+            else if (!_notificationService.socket.Connected)
+                UpdateConnectionState(4, "Disconnected");
+
+            base.OnRestart();
         }
 
         //Prepare the Screen's standard options menu to be displayed.
