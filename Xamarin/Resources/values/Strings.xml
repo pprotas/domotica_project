@@ -14,7 +14,7 @@
   <string name="pin_state_text">Arduino Pin state</string>
   <string name="change_pin_state_value">OFF</string>
   <string name="sensor1_text">Checked-in members: </string>
-  <string name="sensor1_value">0</string>
+  <string name="sensor1_value">000</string>
   <string name="sensor2_text">Front door sensor: </string>
   <string name="sensor2_value">Closed</string>
   <string name="sensor3_text">Stair status: </string>
