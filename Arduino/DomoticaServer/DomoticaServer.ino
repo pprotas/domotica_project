@@ -232,6 +232,7 @@ void executeCommand(char cmd)
       if(DistanceChanged(trigPin, echoPin)){
         server.write("bTR\n");
         tone(buzzer, 8000, 1000);
+        
         Serial.println("yes");
               Serial.println(oldDistanc);
       Serial.println(distanc);
