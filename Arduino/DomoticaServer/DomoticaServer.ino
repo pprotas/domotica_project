@@ -48,7 +48,7 @@ byte mac[] = { 0x40, 0x6c, 0x8f, 0x36, 0x84, 0x8a }; // Ethernet adapter shield 
 int ethPort = 3300;                                  // Take a free port (check your router)
 
 #define RFPin        3  // output, pin to control the RF-sender (and Click-On Click-Off-device)
-#define highPin      6  // output, always HIGH
+#define buzzer       6  // buzzer
 #define switchPin    7  // input, connected to some kind of inputswitch
 //#define ledPin       8  // output, led used for "connect state": blinking = searching; continuously = connected
 //#define infoPin      9  // output, more information
@@ -103,7 +103,7 @@ void setup()
   pinMode(switchPin, INPUT);            // hardware switch, for changing pin state
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
-  pinMode(highPin, OUTPUT);
+  pinMode(buzzer, OUTPUT);
   pinMode(RFPin, OUTPUT);
  //pinMode(ledPin, OUTPUT);
  //pinMode(infoPin, OUTPUT);
@@ -112,7 +112,6 @@ void setup()
   
   //Default states
   digitalWrite(switchPin, HIGH);        // Activate pullup resistors (needed for input pin)
-  digitalWrite(highPin, HIGH);
   digitalWrite(RFPin, LOW);
   //digitalWrite(ledPin, LOW);
   //digitalWrite(infoPin, LOW);
@@ -291,6 +290,32 @@ int DistanceChanged2 (int trigPin2, int echoPin2)
   
 }
 
+void FlashingLights(){
+      changedPin = 1;
+      if (switch1) {
+        switch1 = false;
+        switchDefault(false, 1);
+        Serial.println("Switch #1 = \"OFF\"");
+        switch2 = false;
+        switchDefault(false, 2);
+        Serial.println("Switch #2 = \"OFF\"");
+        switch3 = false;
+        switchDefault(false, 3);
+        Serial.println("Switch #3 = \"OFF\"");
+      }
+      else {
+        switch1 = true;
+        switchDefault(true, 1);
+        Serial.println("Switch #1 = \"ON\"");
+        switch2 = true;
+        switchDefault(true, 2);
+        Serial.println("Switch #2 = \"ON\"");
+        switch3 = true;
+        switchDefault(true, 3);
+        Serial.println("Switch #3 = \"ON\"");
+      }
+}
+
 
 // Implementation of (simple) protocol between app and Arduino
 // Request (from app) is single char ('a', 's', 't', 'i' etc.)
@@ -305,6 +330,10 @@ void executeCommand(char cmd)
       case'p':// PIR peeren en wat niet
       if(pirValue == 1)
       { 
+      if(!AantalIngelogd){
+      tone(buzzer, 8000, 1500);
+      FlashingLights();
+      }
       intToCharBuf("pTR\n", buf, 4); 
       server.write(buf, 4);
       }
@@ -317,22 +346,21 @@ void executeCommand(char cmd)
       intToCharBuf(AantalIngelogd, buf, 4); //tikkele status
       server.write(buf, 4);
       break; 
-    case 'a': // Report sensor value to the app
-      intToCharBuf(sensor1Value, buf, 4);                // convert to charbuffer
-      server.write(buf, 4);                             // response is always 4 chars (\n included)
-      Serial.print("Sensor #1: "); Serial.println(buf);
-      break;
     case 'b': // Report sensor value to the app
       Serial.print("Distance changed?");
       if(DistanceChanged(trigPin, echoPin)){
-        server.write("TRU\n");
+        if(!AantalIngelogd){
+        tone(buzzer, 8000, 1500);
+        FlashingLights();
+        }
+        server.write("bTR\n");
         Serial.println("yes");
               Serial.println(oldDistanc);
       Serial.println(distanc);
       Serial.println(oldDistanc - distanc);
       }
       if(!DistanceChanged(trigPin, echoPin)){
-        server.write("FAL\n");
+        server.write("bFL\n");
         Serial.println("no");
               Serial.println(oldDistanc);
       Serial.println(distanc);
@@ -342,14 +370,18 @@ void executeCommand(char cmd)
 
     case 'c':
     if(DistanceChanged2(trigPin2,echoPin2)){
-      server.write("tru\n");
+      if(!AantalIngelogd){
+      tone(buzzer, 8000, 1500);
+      FlashingLights();
+      }
+      server.write("cTR\n");
         Serial.println("yes");
               Serial.println(oldDistanc2);
       Serial.println(distanc2);
       
     }
     if(!DistanceChanged2(trigPin2, echoPin2)){
-        server.write("fal\n");
+        server.write("cFL\n");
         Serial.println("no");
               Serial.println(oldDistanc2);
       Serial.println(distanc2);

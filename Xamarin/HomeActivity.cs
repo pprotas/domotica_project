@@ -15,6 +15,10 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Android.Graphics;
 using System.Threading.Tasks;
+using NotificationCompat = Android.Support.V4.App.NotificationCompat;
+using TaksStackBuilder = Android.Support.V4.App.TaskStackBuilder;
+using Android.Media;
+using Encoding = System.Text.Encoding;
 
 namespace HomeSafe9001
 {
@@ -25,18 +29,21 @@ namespace HomeSafe9001
         // Controls on GUI
         Button buttonConnect;
         TextView textViewServerConnect, textViewTimerStateValue;
-        public TextView textViewChangePinStateValue, textViewSensorValue1, textViewSensorValue2, textViewDebugValue;
+        public TextView textViewChangePinStateValue, textViewSensorValue1, textViewSensorValue2, textViewSensorValue3, textViewSensorValue4, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
         Spinner spinner;
         Switch switchSwitch1;
         Switch switchSwitch2;
         Switch switchSwitch3;
+        Vibrator vib;
 
         Timer timerClock, timerSockets;             // Timers
         int timerDelay = 1000;
         Socket socket = null;                       // Socket   
         List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
         int listIndex = 0;
+        NotificationCompat.Builder builder;
+        NotificationManager notificationManager;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -51,11 +58,14 @@ namespace HomeSafe9001
             textViewServerConnect = FindViewById<TextView>(Resource.Id.textViewServerConnect);
             textViewSensorValue1 = FindViewById<TextView>(Resource.Id.textViewSensorValue1);
             textViewSensorValue2 = FindViewById<TextView>(Resource.Id.textViewSensorValue2);
+            textViewSensorValue3 = FindViewById<TextView>(Resource.Id.textViewSensorValue3);
+            textViewSensorValue4 = FindViewById<TextView>(Resource.Id.textViewSensorValue4);
             editTextIPAddress = FindViewById<EditText>(Resource.Id.editTextIPAddress);
             editTextIPPort = FindViewById<EditText>(Resource.Id.editTextIPPort);
             switchSwitch1 = FindViewById<Switch>(Resource.Id.switchSwitch1);
             switchSwitch2 = FindViewById<Switch>(Resource.Id.switchSwitch2);
             switchSwitch3 = FindViewById<Switch>(Resource.Id.switchSwitch3);
+            vib = (Vibrator)this.GetSystemService(VibratorService);
 
             spinner = FindViewById<Spinner>(Resource.Id.spinner);
 
@@ -66,11 +76,32 @@ namespace HomeSafe9001
             adapter.SetDropDownViewResource(Android.Resource.Layout.SimpleSpinnerDropDownItem);
             spinner.Adapter = adapter;
 
+            Intent notificationIntent = new Intent(this, typeof(MainActivity));
+
+            TaskStackBuilder stackBuilder = TaskStackBuilder.Create(this);
+            stackBuilder.AddParentStack(Java.Lang.Class.FromType(typeof(MainActivity)));
+            stackBuilder.AddNextIntent(notificationIntent);
+
+            PendingIntent pendingNotificationIntent =
+                stackBuilder.GetPendingIntent(0, PendingIntentFlags.UpdateCurrent);
+
+            builder = new NotificationCompat.Builder(this)
+                .SetAutoCancel(true)
+                .SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification))
+                .SetContentIntent(pendingNotificationIntent)
+                .SetSmallIcon(Resource.Drawable.notificationicon)
+                .SetContentTitle("Movement Detected")
+                .SetPriority(2)
+                .SetOnlyAlertOnce(true);
+
+            notificationManager =
+                (NotificationManager)GetSystemService(NotificationService);
+
             UpdateConnectionState(4, "Disconnected");
 
             // Init commandlist, scheduled by socket timer
             commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue1));
-            commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue2));
+            commandList.Add(new Tuple<string, TextView>("b", textViewSensorValue3));
 
             this.Title = this.Title + " (timer sockets)";
 
@@ -227,18 +258,59 @@ namespace HomeSafe9001
             {
                 if (result == "OFF") textview.SetTextColor(Color.Red);
                 else if (result == " ON") textview.SetTextColor(Color.Green);
-                if (result == "TRU")
+                else if (result == "pTR")
                 {
                     textview.SetTextColor(Color.Red);
                     textview.Text = "Movement detected";
+                    if(textViewSensorValue1.Text == "000")
+                    {
+                        builder.SetContentText("Movement Sensor");
+                        notificationManager.Notify(9001, builder.Build());
+                        vib.Vibrate(2000);
+                    }
                 }
-                else if (result == "FAL")
+                else if (result == "pFL")
                 {
                     textview.SetTextColor(Color.Green);
                     textview.Text = "No movement";
                 }
-                else textview.SetTextColor(Color.White);
-                textview.Text = result;
+                else if (result == "bTR")
+                {
+                    textview.SetTextColor(Color.Red);
+                    textview.Text = "Movement detected";
+                    if(textViewSensorValue1.Text == "000")
+                    {
+                        builder.SetContentText("Stairs");
+                        notificationManager.Notify(9002, builder.Build());
+                        vib.Vibrate(2000);
+                    }
+                }
+                else if (result == "bFL")
+                {
+                    textview.SetTextColor(Color.Green);
+                    textview.Text = "No movement";
+                }
+                else if (result == "cTR")
+                {
+                    textview.SetTextColor(Color.Red);
+                    textview.Text = "Movement detected";
+                    if(textViewSensorValue1.Text == "000")
+                    {
+                        builder.SetContentText("Front Door Open");
+                        notificationManager.Notify(9003, builder.Build());
+                        vib.Vibrate(2000);
+                    }
+                }
+                else if (result == "cFL")
+                {
+                    textview.SetTextColor(Color.Green);
+                    textview.Text = "Closed";
+                }
+                else
+                {
+                    textview.SetTextColor(Color.White);
+                    textview.Text = result;
+                }
             });
         }
 
