@@ -50,8 +50,8 @@ int ethPort = 3300;                                  // Take a free port (check 
 #define RFPin        3  // output, pin to control the RF-sender (and Click-On Click-Off-device)
 #define highPin      6  // output, always HIGH
 #define switchPin    7  // input, connected to some kind of inputswitch
-#define ledPin       8  // output, led used for "connect state": blinking = searching; continuously = connected
-#define infoPin      4  // output, more information
+//#define ledPin       8  // output, led used for "connect state": blinking = searching; continuously = connected
+//#define infoPin      9  // output, more information
 #define analogPin0   0  // sensor value
 #define analogPin1   1
 
@@ -69,16 +69,27 @@ bool pinChange = false;                  // Variable to store actual pin change
 int sensor1Value = 0;                    // Variable to store actual sensor value
 int sensor2Value = 0;
 int changedPin;
-int MasterValue1 = 11;
-int MasterValuePIR = 7;
-int AantalIngelogd = 0;
-bool tikkele ;
-bool jorar107 ;
+
 int duration;
 int distanc;
 int oldDistanc;
 int trigPin = 4;
 int echoPin = 5;
+
+int duration2;
+int distanc2;
+int oldDistanc2;
+int trigPin2 = 8;
+int echoPin2 = 9;
+bool doorstate;
+
+int MasterValue1 = 11;
+int AantalIngelogd = 0;
+bool tikkele ;
+bool jorar107 ;
+
+int pirValue ;
+int pirPin =7;
 
 void setup()
 {
@@ -87,31 +98,33 @@ void setup()
 
   Serial.println("Domotica project, Arduino Domotica Server\n");
   Wire.begin(9);                          //Set arduino slave/master connectie
-  Wire.onReceive(receiveEvent);           //master ==> slave values event
-
+  Wire.onReceive(receiveEvent); 
   //Init I/O-pins
   pinMode(switchPin, INPUT);            // hardware switch, for changing pin state
-  pinMode(highPin, OUTPUT);
-  pinMode(RFPin, OUTPUT);
-  pinMode(ledPin, OUTPUT);
-  pinMode(infoPin, OUTPUT);
-
-  //Default states
-  digitalWrite(switchPin, HIGH);        // Activate pullup resistors (needed for input pin)
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  pinMode(highPin, OUTPUT);
+  pinMode(RFPin, OUTPUT);
+ //pinMode(ledPin, OUTPUT);
+ //pinMode(infoPin, OUTPUT);
+  pinMode(trigPin2, OUTPUT);
+  pinMode(echoPin2, INPUT);
+  
+  //Default states
+  digitalWrite(switchPin, HIGH);        // Activate pullup resistors (needed for input pin)
   digitalWrite(highPin, HIGH);
   digitalWrite(RFPin, LOW);
-  digitalWrite(ledPin, LOW);
-  digitalWrite(infoPin, LOW);
+  //digitalWrite(ledPin, LOW);
+  //digitalWrite(infoPin, LOW);
 
   digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
-  oldDistanc = duration * 0.034 / 2;
+      delayMicroseconds(2);
+      digitalWrite(trigPin, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trigPin, LOW);
+      duration = pulseIn(echoPin, HIGH);
+      oldDistanc = duration*0.034/2; 
+
   //Try to get an IP address from the DHCP server.
   if (Ethernet.begin(mac) == 0)
   {
@@ -120,7 +133,7 @@ void setup()
     }
   }
 
-  Serial.print("LED (for connect-state and pin-state) on pin "); Serial.println(ledPin);
+//  Serial.print("LED (for connect-state and pin-state) on pin "); Serial.println(ledPin);
   Serial.print("Input switch on pin "); Serial.println(switchPin);
   Serial.println("Ethernetboard connected (pins 10, 11, 12, 13 and SPI)");
   Serial.println("Connect to DHCP source in local network (blinking led -> waiting for connection)");
@@ -136,66 +149,60 @@ void setup()
   int IPnr = getIPComputerNumber(Ethernet.localIP());   // Get computernumber in local network 192.168.1.3 -> 3)
   Serial.print(" ["); Serial.print(IPnr); Serial.print("] ");
   Serial.print("  [Testcase: telnet "); Serial.print(Ethernet.localIP()); Serial.print(" "); Serial.print(ethPort); Serial.println("]");
-  signalNumber(ledPin, IPnr);
+//  signalNumber(ledPin, IPnr);
 }
-
 void receiveEvent(int bytes) {      //read rfid send data from master
-  MasterValue1 = Wire.read();
-  // Serial.println(MasterValue1);
+  MasterValue1 = Wire.read(); 
+ // Serial.println(MasterValue1);
   if (MasterValue1 == 0) {
-
-    if (tikkele)
+    
+    if(tikkele)
     {
-      AantalIngelogd--;
-      tikkele = false;
+      AantalIngelogd--; // uiloggen
+      tikkele = false;      
     }
-    else if (tikkele == false)
+    else if(tikkele == false)
     {
-      AantalIngelogd;
-      tikkele = true;
-    }
-    Serial.print("AantalIngelogd=");  Serial.println(AantalIngelogd);
-    Serial.print("tikkele=");         Serial.println(tikkele);
-    Serial.print("MasterValue1=");    Serial.println(MasterValue1);
-    Serial.println("  ");
-    delay(1000);
-    MasterValue1 = 11;
+      AantalIngelogd++; // inloggen
+      tikkele= true;    
+    }  
+     delay(100);
+     MasterValue1 =11;  //reset mastervalue
   }
-  else if (MasterValue1 == 1) {
-    if (jorar107)
+ else if (MasterValue1 == 1) {
+    if(jorar107)
     {
       AantalIngelogd--;
       jorar107 = false;
     }
-    else if (jorar107 == false)
+    else if(jorar107 == false)
     {
-      AantalIngelogd;
-      jorar107 = true;
-    }
-    Serial.print("AantalIngelogd=");  Serial.println(AantalIngelogd);
-    Serial.print("jorar107=");        Serial.println(jorar107);
-    Serial.print("MasterValue1=");    Serial.println(MasterValue1);
-    Serial.println("  ");
-    delay(1000);
-    MasterValue1 = 11;
-  }
-  // delay(1000);
+      AantalIngelogd++;
+      jorar107= true;
+    }        
+     delay(100);
+     MasterValue1=11;
+  } 
 }
 
+void PIR()
+{
+  pirValue = digitalRead(pirPin);  
+  //Serial.println(pirValue);
+  delay(500);
+}
 void loop()
 {
-
+  PIR(); 
   // Listen for incomming connection (app)
   EthernetClient ethernetClient = server.available();
   if (!ethernetClient) {
-    blink(ledPin);
+//    blink(ledPin);
     return; // wait for connection and blink LED
-
   }
 
-
   Serial.println("Application connected");
-  digitalWrite(ledPin, LOW);
+//  digitalWrite(ledPin, LOW);
   switchDefault(false, 1);
   delay(100);
   switchDefault(false, 2);
@@ -217,12 +224,12 @@ void loop()
     // Activate pin based op pinState
     if (pinChange) {
       if (pinState) {
-        digitalWrite(ledPin, HIGH);
+//        digitalWrite(ledPin, HIGH);
         switchDefault(true, changedPin);
       }
       else {
         switchDefault(false, changedPin);
-        digitalWrite(ledPin, LOW);
+//        digitalWrite(ledPin, LOW);
       }
       pinChange = false;
     }
@@ -245,25 +252,46 @@ void switchDefault(bool state, int unit)
   //delay(100);
   //actionTransmitter.sendSignal(unitCodeActionOld, actionDevice, state);  // Action Kaku, old model
   //delay(100);
-  //mySwitch.send(2210410  state, 24);  // tricky, false = 0, true = 1  // Action Kaku, new model
+  //mySwitch.send(2210410 + state, 24);  // tricky, false = 0, true = 1  // Action Kaku, new model
   //delay(100);
 }
+int DistanceChanged(int trig, int echo){
+      digitalWrite(trig, LOW);
+      delayMicroseconds(2);
+      digitalWrite(trig, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trig, LOW);
+      duration = pulseIn(echo, HIGH);
+      distanc= duration*0.034/2; 
+      if(oldDistanc - distanc > 5){
+        return 1;
+      }
+      else{
+        return 0;
+      }      
+}
 
-int DistanceChanged(int trig, int echo) {
-  digitalWrite(trig, LOW);
+int DistanceChanged2 (int trigPin2, int echoPin2)
+{
+  digitalWrite(trigPin2,LOW);
   delayMicroseconds(2);
-  digitalWrite(trig, HIGH);
+  digitalWrite(trigPin2, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trig, LOW);
-  duration = pulseIn(echo, HIGH);
-  distanc = duration * 0.034 / 2;
-  if (oldDistanc - distanc > 5) {
+  digitalWrite(trigPin2,LOW);
+  duration2 = pulseIn(echoPin2,HIGH);
+  distanc2 = duration2*0.034/2;
+  if(distanc2 <10)
+  {
     return 1;
   }
-  else {
+  else
+  {
     return 0;
   }
+  
 }
+
+
 // Implementation of (simple) protocol between app and Arduino
 // Request (from app) is single char ('a', 's', 't', 'i' etc.)
 // Response (to app) is 4 chars  (not all commands demand a response)
@@ -274,10 +302,21 @@ void executeCommand(char cmd)
   // Command protocol
   Serial.print("["); Serial.print(cmd); Serial.print("] -> ");
   switch (cmd) {
-    case'r':// rfid shizzselss
+      case'p':// PIR peeren en wat niet
+      if(pirValue == 1)
+      { 
+      intToCharBuf("pTR\n", buf, 4); 
+      server.write(buf, 4);
+      }
+      else{
+      intToCharBuf("pFL\n", buf, 4); 
+      server.write(buf, 4);
+      }
+      break;
+      case'r':// rfid shizzselss
       intToCharBuf(AantalIngelogd, buf, 4); //tikkele status
       server.write(buf, 4);
-      break;
+      break; 
     case 'a': // Report sensor value to the app
       intToCharBuf(sensor1Value, buf, 4);                // convert to charbuffer
       server.write(buf, 4);                             // response is always 4 chars (\n included)
@@ -285,20 +324,39 @@ void executeCommand(char cmd)
       break;
     case 'b': // Report sensor value to the app
       Serial.print("Distance changed?");
-      if (DistanceChanged(trigPin, echoPin)) {
+      if(DistanceChanged(trigPin, echoPin)){
         server.write("TRU\n");
         Serial.println("yes");
-        Serial.println(oldDistanc);
-        Serial.println(distanc);
-        Serial.println(oldDistanc - distanc);
+              Serial.println(oldDistanc);
+      Serial.println(distanc);
+      Serial.println(oldDistanc - distanc);
       }
-      if (!DistanceChanged(trigPin, echoPin)) {
+      if(!DistanceChanged(trigPin, echoPin)){
         server.write("FAL\n");
         Serial.println("no");
-        Serial.println(oldDistanc);
-        Serial.println(distanc);
-        Serial.println(oldDistanc - distanc);
+              Serial.println(oldDistanc);
+      Serial.println(distanc);
+      Serial.println(oldDistanc - distanc);
       }
+      break;
+
+    case 'c':
+    if(DistanceChanged2(trigPin2,echoPin2)){
+      server.write("tru\n");
+        Serial.println("yes");
+              Serial.println(oldDistanc2);
+      Serial.println(distanc2);
+      
+    }
+    if(!DistanceChanged2(trigPin2, echoPin2)){
+        server.write("fal\n");
+        Serial.println("no");
+              Serial.println(oldDistanc2);
+      Serial.println(distanc2);
+      
+      }
+      break;
+    
     case 's': // Report switch state to the app
       if (pinState) {
         server.write(" ON\n");  // always send 4 chars
@@ -362,13 +420,11 @@ void executeCommand(char cmd)
       }
       //pinChange = true;
       break;
-    case 'i':
-      digitalWrite(infoPin, HIGH);
-      break;
     default:
-      digitalWrite(infoPin, LOW);
+          Serial.print(" ");
   }
 }
+
 
 // read value from pin pn, return value is mapped between 0 and mx-1
 int readSensor(int pn, int mx)
@@ -381,9 +437,9 @@ void intToCharBuf(int val, char buf[], int len)
 {
   String s;
   s = String(val);                        // convert tot string
-  if (s.length() == 1) s = "0"  s;       // prefix redundant "0"
-  if (s.length() == 2) s = "0"  s;
-  s = s  "\n";                           // add newline
+  if (s.length() == 1) s = "0" + s;       // prefix redundant "0"
+  if (s.length() == 2) s = "0" + s;
+  s = s + "\n";                           // add newline
   s.toCharArray(buf, len);                // convert string to char-buffer
 }
 
@@ -425,7 +481,7 @@ void blink(int pn)
 void signalNumber(int pin, int n)
 {
   int i;
-  for (i = 0; i < 30; i)
+  for (i = 0; i < 30; i++)
   {
     digitalWrite(pin, HIGH);
     delay(20);
@@ -433,7 +489,7 @@ void signalNumber(int pin, int n)
     delay(20);
   }
   delay(1000);
-  for (i = 0; i < n; i)
+  for (i = 0; i < n; i++)
   {
     digitalWrite(pin, HIGH);
     delay(300);
@@ -446,9 +502,9 @@ void signalNumber(int pin, int n)
 // Convert IPAddress tot String (e.g. "192.168.1.105")
 String IPAddressToString(IPAddress address)
 {
-  return String(address[0])  "."
-         String(address[1])  "."
-         String(address[2])  "."
+  return String(address[0]) + "." +
+         String(address[1]) + "." +
+         String(address[2]) + "." +
          String(address[3]);
 }
 
@@ -469,4 +525,5 @@ int getIPComputerNumberOffset(IPAddress address, int offset)
 {
   return getIPComputerNumber(address) - offset;
 }
+
 
