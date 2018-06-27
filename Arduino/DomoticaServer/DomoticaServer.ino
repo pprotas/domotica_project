@@ -70,9 +70,10 @@ int sensor1Value = 0;                    // Variable to store actual sensor valu
 int sensor2Value = 0;
 int changedPin;
 
-int duration;
+long duration;
 int distanc;
-int oldDistanc;
+long oldDuration;
+long oldDistanc = 10;
 int trigPin = 4;
 int echoPin = 5;
 
@@ -116,13 +117,15 @@ void setup()
   //digitalWrite(ledPin, LOW);
   //digitalWrite(infoPin, LOW);
 
-  digitalWrite(trigPin, LOW);
+  /*digitalWrite(trigPin, LOW);
       delayMicroseconds(2);
       digitalWrite(trigPin, HIGH);
       delayMicroseconds(10);
       digitalWrite(trigPin, LOW);
-      duration = pulseIn(echoPin, HIGH);
-      oldDistanc = duration*0.034/2; 
+      oldDuration = pulseIn(echoPin, HIGH);
+      oldDistanc = oldDuration*0.034/2; 
+      Serial.print("OldDistanc = ");
+      Serial.println(oldDistanc);*/
 
   //Try to get an IP address from the DHCP server.
   if (Ethernet.begin(mac) == 0)
@@ -191,8 +194,7 @@ void PIR()
   delay(500);
 }
 void loop()
-{
-  PIR(); 
+{ 
   // Listen for incomming connection (app)
   EthernetClient ethernetClient = server.available();
   if (!ethernetClient) {
@@ -212,13 +214,20 @@ void loop()
   while (ethernetClient.connected())
   {
     checkEvent(switchPin, pinState);          // update pin state
-    sensor1Value = readSensor(0, 100);         // update sensor value
     delay(10);
-    sensor1Value = readSensor(0, 100);
+    checkEvent(switchPin, pinState);
     delay(100);
-    sensor2Value = readSensor(2, 100);
+    PIR();         // update sensor value
     delay(10);
-    sensor2Value = readSensor(2, 100);
+    PIR();
+    delay(100);
+    distanc = DistanceChanged(trigPin, echoPin);
+    delay(10);
+    distanc = DistanceChanged(trigPin, echoPin);
+    delay(100);
+    distanc2 = DistanceChanged(trigPin2, echoPin2);
+    delay(10);
+    distanc2 = DistanceChanged(trigPin2, echoPin2);  
 
     // Activate pin based op pinState
     if (pinChange) {
@@ -261,16 +270,17 @@ int DistanceChanged(int trig, int echo){
       delayMicroseconds(10);
       digitalWrite(trig, LOW);
       duration = pulseIn(echo, HIGH);
-      distanc= duration*0.034/2; 
-      if(oldDistanc - distanc > 5){
+      return duration*0.034/2;
+      //distanc = duration*0.034/2; 
+      /*if(oldDistanc - distanc > 5){
         return 1;
       }
       else{
         return 0;
-      }      
+      }    */  
 }
 
-int DistanceChanged2 (int trigPin2, int echoPin2)
+/*int*/ void DistanceChanged2 (int trigPin2, int echoPin2)
 {
   digitalWrite(trigPin2,LOW);
   delayMicroseconds(2);
@@ -279,14 +289,14 @@ int DistanceChanged2 (int trigPin2, int echoPin2)
   digitalWrite(trigPin2,LOW);
   duration2 = pulseIn(echoPin2,HIGH);
   distanc2 = duration2*0.034/2;
-  if(distanc2 <10)
+  /*if(distanc2 <10)
   {
     return 1;
   }
   else
   {
     return 0;
-  }
+  }*/
   
 }
 
@@ -334,12 +344,10 @@ void executeCommand(char cmd)
       tone(buzzer, 8000, 1500);
       FlashingLights();
       }
-      intToCharBuf("pTR\n", buf, 4); 
-      server.write(buf, 4);
+      server.write("pTR\n");
       }
       else{
-      intToCharBuf("pFL\n", buf, 4); 
-      server.write(buf, 4);
+      server.write("pFL\n");
       }
       break;
       case'r':// rfid shizzselss
@@ -348,7 +356,7 @@ void executeCommand(char cmd)
       break; 
     case 'b': // Report sensor value to the app
       Serial.print("Distance changed?");
-      if(DistanceChanged(trigPin, echoPin)){
+      if(oldDistanc - distanc > 5){
         if(!AantalIngelogd){
         tone(buzzer, 8000, 1500);
         FlashingLights();
@@ -359,7 +367,8 @@ void executeCommand(char cmd)
       Serial.println(distanc);
       Serial.println(oldDistanc - distanc);
       }
-      if(!DistanceChanged(trigPin, echoPin)){
+      else//(!DistanceChanged(trigPin, echoPin))
+        {
         server.write("bFL\n");
         Serial.println("no");
               Serial.println(oldDistanc);
@@ -369,7 +378,7 @@ void executeCommand(char cmd)
       break;
 
     case 'c':
-    if(DistanceChanged2(trigPin2,echoPin2)){
+    if(distanc2 < 10){
       if(!AantalIngelogd){
       tone(buzzer, 8000, 1500);
       FlashingLights();
@@ -380,7 +389,8 @@ void executeCommand(char cmd)
       Serial.println(distanc2);
       
     }
-    if(!DistanceChanged2(trigPin2, echoPin2)){
+    else//(!DistanceChanged2(trigPin2, echoPin2))
+    {
         server.write("cFL\n");
         Serial.println("no");
               Serial.println(oldDistanc2);
