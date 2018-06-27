@@ -9,14 +9,14 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:minWidth="25px"
-        android:minHeight="25px">
+        android:minWidth="@dimen/MinWidth"
+        android:minHeight="@dimen/MinHeight">
         <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/relativeLayout1"
-            android:layout_marginBottom="0.0dp"
+            android:layout_marginBottom="@dimen/Margin"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:gravity="center_vertical|center_horizontal|center">
@@ -29,16 +29,16 @@
                 android:id="@+id/connectionTextView" />
             <TextView
                 android:text="@string/timer_state_text"
-                android:layout_width="150dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Home_Layout_Width"
+                android:layout_height="@dimen/Home_Layout_Height"
                 android:id="@+id/textViewTimerState"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/connectionTextView"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
                 android:text="@string/timer_state_value"
-                android:layout_width="200dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Secondary_Layout_Width"
+                android:layout_height="@dimen/Home_Layout_Height"
                 android:id="@+id/textViewTimerStateValue"
                 android:layout_alignParentRight="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -47,61 +47,61 @@
             <TextView
                 android:text="@string/arduino_server_text"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_width="150dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Home_Layout_Width"
+                android:layout_height="@dimen/Home_Layout_Height"
                 android:id="@+id/textViewServer"
                 android:layout_below="@id/textViewTimerState"
                 android:layout_alignParentLeft="true" />
             <TextView
                 android:text="@string/arduino_server_connect"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_width="200dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Secondary_Layout_Width"
+                android:layout_height="@dimen/Home_Layout_Height"
                 android:id="@+id/textViewServerConnect"
                 android:layout_below="@id/textViewTimerStateValue"
                 android:layout_alignParentRight="true"
                 android:textColor="@android:color/holo_red_dark" />
             <TextView
                 android:text="@string/ip_address_text"
-                android:layout_width="150dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/Home_Layout_Width"
+                android:layout_height="@dimen/Secondary_Layout_Height"
                 android:id="@+id/textViewIPAddress"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/textViewServer" />
             <TextView
                 android:text="@string/ip_port_text"
-                android:layout_width="200dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/Secondary_Layout_Width"
+                android:layout_height="@dimen/Secondary_Layout_Height"
                 android:id="@+id/textViewIPPort"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/textViewServerConnect" />
             <EditText
-                android:layout_width="150dp"
+                android:layout_width="@dimen/Home_Layout_Width"
                 android:layout_height="wrap_content"
                 android:id="@+id/editTextIPAddress"
                 android:text="@string/ip_address_value"
-                android:lines="1"
-                android:minLines="1"
-                android:maxLines="1"
+                android:lines="@dimen/Lines"
+                android:minLines="@dimen/Lines"
+                android:maxLines="@dimen/Lines"
                 android:inputType="numberDecimal"
-                android:digits="0123456789."
+                android:digits="@string/Digits"
                 android:layout_below="@id/textViewIPAddress"
                 android:layout_alignParentLeft="true" />
             <EditText
-                android:layout_width="200dp"
+                android:layout_width="@dimen/Secondary_Layout_Width"
                 android:layout_height="wrap_content"
                 android:id="@+id/editTextIPPort"
                 android:text="@string/ip_port_value"
-                android:lines="1"
-                android:minLines="1"
-                android:maxLines="1"
+                android:lines="@dimen/Lines"
+                android:minLines="@dimen/Lines"
+                android:maxLines="@dimen/Lines"
                 android:inputType="numberDecimal"
-                android:digits="0123456789"
+                android:digits="@string/Digits"
                 android:layout_below="@id/textViewIPPort"
                 android:layout_alignParentRight="true" />
             <Button
                 android:text="@string/button_connect_text"
-                android:layout_width="150dp"
+                android:layout_width="@dimen/Home_Layout_Width"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/editTextIPAddress"
                 android:id="@+id/buttonConnect"
@@ -136,7 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/switchSwitch1"
-                android:layout_marginBottom="1.0dp" />
+                android:layout_marginBottom="@dimen/MarginBottom" />
             <Switch
                 android:text="@string/switch_switch3_text"
                 android:id="@+id/switchSwitch3"
@@ -153,14 +153,14 @@
                 android:layout_below="@id/switchSwitch3" />
             <TextView
                 android:text="Measurement delay:"
-                android:layout_width="200dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Secondary_Layout_Width"
+                android:layout_height="@dimen/Home_Layout_Height"
                 android:id="@+id/textViewDelay"
                 android:layout_alignParentLeft="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_below="@id/textView3" />
             <Spinner
-                android:layout_width="200dp"
+                android:layout_width="@dimen/Secondary_Layout_Width"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner"
                 android:prompt="@string/planet_prompt"
@@ -168,71 +168,71 @@
                 android:layout_below="@id/textView3" />
             <TextView
                 android:text="@string/sensor1_text"
-                android:layout_width="175dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Text_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensor1"
                 android:layout_alignParentLeft="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_below="@+id/spinner" />
             <TextView
                 android:text="@string/sensor1_value"
-                android:layout_width="185dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Value_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensorValue1"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/spinner"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
                 android:text="@string/sensor2_text"
-                android:layout_width="175dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Text_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensor2"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textViewSensor1"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
                 android:text="@string/sensor2_value"
-                android:layout_width="185dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Value_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensorValue2"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/textViewSensor1"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_marginRight="0.0dp" />
+                android:layout_marginRight="@dimen/Margin" />
             <TextView
                 android:text="@string/sensor3_text"
-                android:layout_width="175dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Text_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensor3"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textViewSensor2"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
                 android:text="@string/sensor3_value"
-                android:layout_width="185dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Value_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensorValue3"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/textViewSensor2"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_marginRight="0.0dp" />
+                android:layout_marginRight="@dimen/Margin" />
             <TextView
                 android:text="@string/sensor4_text"
-                android:layout_width="175dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Text_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensor4"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textViewSensor3"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <TextView
                 android:text="@string/sensor4_value"
-                android:layout_width="185dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/Sensor_Value_Width"
+                android:layout_height="@dimen/Sensor_Height"
                 android:id="@+id/textViewSensorValue4"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/textViewSensor3"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_marginRight="0.0dp" />
+                android:layout_marginRight="@dimen/Margin" />
         </RelativeLayout>
     </LinearLayout>
 </ScrollView>

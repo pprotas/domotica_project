@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+  <dimen name="Sensor_Text_Width">175dp</dimen>
+  <dimen name="Sensor_Height">30dp</dimen>
+  <dimen name="Sensor_Value_Width">185dp</dimen>
+  <dimen name="Home_Layout_Width">150dp</dimen>
+  <dimen name="Home_Layout_Height">30dp</dimen>
+  <dimen name="Secondary_Layout_Width">200dp</dimen>
+  <dimen name="Secondary_Layout_Height">20dp</dimen>
+  <dimen name="Lines">1</dimen>
+  <dimen name="Main_Layout_Width">match_parent</dimen>
+  <dimen name="Main_Layout_Height">wrap_content</dimen>
+  <dimen name="Finger">150dp</dimen>
+  <dimen name="Finger_Text">20sp</dimen>
+  <dimen name="Margin">0.0dp</dimen>
+  <dimen name="MinHeight">25px</dimen>
+  <dimen name="MinWidth">25px</dimen>
+  <dimen name="MarginBottom">1.0dp</dimen>
+</resources>

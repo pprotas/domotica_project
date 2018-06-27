@@ -28,6 +28,17 @@
   <string name="switch_switch1_text">Switch 1</string>
   <string name="switch_switch2_text">Switch 2</string>
   <string name="switch_switch3_text">Switch 3</string>
+  <string name="LogIn">Log In</string>
+  <string name="Username">Username</string>
+  <string name="Password">Password</string>
+  <string name="Continue">Continue</string>
+  <string name="OR">OR</string>
+  <string name="Digits">0123456789</string>
+  <string name="Verify">Please place your fingertip on the scanner to verify your identity</string>
+
+
+
+
   <string name="planet_prompt">Choose a delay</string>
   <string-array name="planets_array">
     <item>1</item>
